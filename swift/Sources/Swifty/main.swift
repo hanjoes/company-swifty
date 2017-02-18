@@ -31,7 +31,7 @@ func main() {
     print(argv)
 
     /// Check for the Package.swift file and use that to decide
-    /// the working directory.
+    /// the working directory and module info.
     let workInfo = FileHelper.figureWorkingInfo(path: argv[1])
     print(workInfo)
 }
