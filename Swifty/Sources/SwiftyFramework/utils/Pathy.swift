@@ -46,7 +46,7 @@ public struct Pathy {
     
     // MARK: - Functions
     
-    init(_ path : String) {
+    public init(_ path : String) {
         rawPath = path
     }
     

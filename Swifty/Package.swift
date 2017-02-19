@@ -1,5 +1,9 @@
 import PackageDescription
 
 let package = Package(
-    name: "Swifty"
+    name: "Swifty",
+    targets: [
+      Target(name: "SwiftyFramework"),
+      Target(name: "Swifty", dependencies: ["SwiftyFramework"])
+    ]
 )

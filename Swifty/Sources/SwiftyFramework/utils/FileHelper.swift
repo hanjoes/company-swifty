@@ -3,11 +3,11 @@ import Foundation
 // MARK: - FileHelper
 
 /// File related functionalities.
-struct FileHelper {
+public struct FileHelper {
     
     /// A working info contains the working directory
     /// and the module name.
-    typealias WorkingInfo = (workingDir: String?, moduleName: String?)
+    public typealias WorkingInfo = (workingDir: String?, moduleName: String?)
     
     // MARK: - Properties
     
@@ -18,7 +18,7 @@ struct FileHelper {
 
     // MARK: - Functions
     
-    static func figureWorkingInfo(path: String) -> WorkingInfo {
+    public static func figureWorkingInfo(path: String) -> WorkingInfo {
         let absPath = getAbsolutePath(path: path)
         
         // TODO: - What if the file is the Package.swift?

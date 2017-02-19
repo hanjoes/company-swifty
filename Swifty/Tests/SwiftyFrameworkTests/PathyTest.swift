@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import Swifty
+@testable import SwiftyFramework
 
 class PathyTest: XCTestCase {
     

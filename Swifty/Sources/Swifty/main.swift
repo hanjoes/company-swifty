@@ -1,4 +1,5 @@
 import Foundation
+import SwiftyFramework
 
 ///
 /// Using SourceKitten to generate autocomplete candidates.
