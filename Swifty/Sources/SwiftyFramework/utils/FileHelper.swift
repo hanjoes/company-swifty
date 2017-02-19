@@ -15,11 +15,15 @@ public struct FileHelper {
     static let INVALID_WORKING_INFO: WorkingInfo = (nil, nil)
     
     private static let SPM_MANIFEST = "Package.swift"
+    
+    private static var fileManager: FileManager {
+        return FileManager.default
+    }
 
     // MARK: - Functions
     
     public static func figureWorkingInfo(path: String) -> WorkingInfo {
-        let absPath = getAbsolutePath(path: path)
+        let absPath = Pathy(path).absPath
         
         // TODO: - What if the file is the Package.swift?
         
@@ -31,12 +35,13 @@ public struct FileHelper {
         
         // get working directory
         let packageDirectory = absPath.substring(to: sourcesRange.lowerBound)
+        let sourcesDirectory = absPath.substring(to: sourcesRange.upperBound)
         
         // change working directory to the one contains manifest
-        FileManager.default.changeCurrentDirectoryPath(packageDirectory)
+        fileManager.changeCurrentDirectoryPath(packageDirectory)
         
         // get manifest file path
-        guard FileManager.default.fileExists(atPath: SPM_MANIFEST) else {
+        guard fileManager.fileExists(atPath: SPM_MANIFEST) else {
             return FileHelper.INVALID_WORKING_INFO
         }
         
@@ -76,26 +81,13 @@ public struct FileHelper {
             // if ../Sources/<targetName> is a directory
             for target in targets {
                 if let targetName = target["name"] as? String {
+                    let modulePath = Pathy(sourcesDirectory + "/" + targetName)
+                    if modulePath.isDirectory && absPath.hasPrefix(modulePath.path) {
+                        return (packageDirectory, targetName)
+                    }
                 }
             }
         }
-        
-        print(dumpDict["name"] as! String)
-        
-        
-        return ("", "")
-    }
-   
-    private static func getAbsolutePath(path: String) -> String {
-        var fullFilePath: String
-
-        if path.hasPrefix("/") {
-            fullFilePath = path
-        }
-        else {
-            let workingDir = FileManager.default.currentDirectoryPath
-            fullFilePath = workingDir + "/" + path
-        }
-        return fullFilePath
+        return FileHelper.INVALID_WORKING_INFO
     }
 }
