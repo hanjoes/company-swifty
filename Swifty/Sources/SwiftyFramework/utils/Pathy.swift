@@ -15,8 +15,17 @@ public struct Pathy {
     }
     
     /// The normalized, absolute path.
+    /// - note: Only append working directory if the rawPath
+    /// is relative.
     public var absPath: String {
-        return Pathy.normalized(path: fileManager.currentDirectoryPath + "/" + rawPath)
+        var unnormalized: String
+        if rawPath.hasPrefix("/") {
+            unnormalized = rawPath
+        }
+        else {
+            unnormalized = fileManager.currentDirectoryPath + "/" + rawPath
+        }
+        return Pathy.normalized(path: unnormalized)
     }
     
     /// Same as path, un-normalized.
@@ -51,20 +60,41 @@ public struct Pathy {
     }
     
     /// Normalize a given path string.
+    /// If there are too many ".." in the path (more
+    /// than the level of directories from filesystem root),
+    /// root directory is assumed. 
     ///
+    /// - note: Only calculate ".." when it's absolute path.
     /// - Parameter path: input, unnormlaized path
     /// - Returns: normalized path
     public static func normalized(path p: String) -> String {
         let isAbsolute = p.hasPrefix("/")
         let elements = p.characters.split(separator: "/", omittingEmptySubsequences: true)
+        // For single dot, we just ignore it
         let nonEmptyElements = elements.filter {
-            sub in !(sub.elementsEqual(".".characters) || sub.elementsEqual("..".characters))
+            !$0.elementsEqual(".".characters)
         }
-        let normalized = String(nonEmptyElements.joined(separator: "/".characters))
-        return (isAbsolute ? "/" : "") + normalized
+        // For double dots, each ".." will accordingly erase
+        // the path element right before it.
+        if isAbsolute {
+            var resultElements = [String]()
+            for element in nonEmptyElements {
+                if element.elementsEqual("..".characters) {
+                    _ = resultElements.popLast()
+                }
+                else {
+                    resultElements.append(String(element))
+                }
+            }
+            return "/" + resultElements.joined(separator: "/")
+        }
+        
+        return String(nonEmptyElements.joined(separator: "/".characters))
     }
     
 }
+
+// MARK: - Overload "/"
 
 /// Simulates the "/" behavior in some file systems to define
 /// a path.
