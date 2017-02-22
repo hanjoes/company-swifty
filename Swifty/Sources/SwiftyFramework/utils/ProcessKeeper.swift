@@ -38,10 +38,14 @@ public struct ProcessKeeper {
         newTask.standardOutput = outPipe
         
         newTask.launch()
-        newTask.waitUntilExit()
         
-        let outData = outPipe.fileHandleForReading.readDataToEndOfFile()
-        let errData = errPipe.fileHandleForReading.readDataToEndOfFile()
+        var outData = Data()
+        var errData = Data()
+        while newTask.isRunning {
+            outData.append(outPipe.fileHandleForReading.availableData)
+            errData.append(outPipe.fileHandleForReading.availableData)
+        }
+        newTask.waitUntilExit()
         
         return (Int(newTask.terminationStatus), outData, errData)
     }
