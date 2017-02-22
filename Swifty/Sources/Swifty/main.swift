@@ -45,9 +45,7 @@ func main() {
                                            "--file", inputFile,
                                            "--offset", offset])
     let result = keeper.syncRun()
-    print(result.0)
     print(String(data: result.1, encoding: .utf8)!)
-    print(String(data: result.2, encoding: .utf8)!)
 }
 
 main()
