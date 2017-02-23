@@ -4,16 +4,16 @@ import Foundation
 
 /// Pathy is the reprensentation of a system path.
 public struct Pathy {
-    
+
     // MARK: - Fields
-    
+
     /// The path represented by this Pathy entity.
     /// Could be either relative or absolute.
     /// Path will always be normalized.
     public var path: String {
         return Pathy.normalized(path: rawPath)
     }
-    
+
     /// The normalized, absolute path.
     /// - note: Only append working directory if the rawPath
     /// is relative.
@@ -27,15 +27,15 @@ public struct Pathy {
         }
         return Pathy.normalized(path: unnormalized)
     }
-    
+
     /// Same as path, un-normalized.
     public var rawPath: String
-    
+
     /// Checks whether the path exists.
     public var exists: Bool {
         return self.fileManager.fileExists(atPath: rawPath)
     }
-    
+
     /// Whether this pathy entity represents
     /// a directory. If the path does not exist
     /// in file system, then it's considered not
@@ -48,21 +48,21 @@ public struct Pathy {
         self.fileManager.fileExists(atPath: rawPath, isDirectory: &isDir)
         return isDir.boolValue
     }
-    
+
     private var fileManager: FileManager {
         return FileManager.default
     }
-    
+
     // MARK: - Functions
-    
+
     public init(_ path : String) {
         rawPath = path
     }
-    
+
     /// Normalize a given path string.
     /// If there are too many ".." in the path (more
     /// than the level of directories from filesystem root),
-    /// root directory is assumed. 
+    /// root directory is assumed.
     ///
     /// - note: Only calculate ".." when it's absolute path.
     /// - Parameter path: input, unnormlaized path
@@ -88,10 +88,10 @@ public struct Pathy {
             }
             return "/" + resultElements.joined(separator: "/")
         }
-        
+
         return String(nonEmptyElements.joined(separator: "/".characters))
     }
-    
+
 }
 
 // MARK: - Overload "/"
@@ -110,9 +110,9 @@ func /(directory: Pathy, pathy: Pathy) -> Pathy {
 // MARK: - CustomStringConvertible
 
 extension Pathy: CustomStringConvertible {
-    
+
     public var description: String {
         return path
     }
-    
+
 }

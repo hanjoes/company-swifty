@@ -38,15 +38,18 @@ func main() {
     guard let moduleName = sfm.moduleName else {
         return
     }
-    
+
     let keeper = ProcessKeeper(execPath: "/usr/local/bin/sourcekitten",
                                arguments: ["complete",
                                            "--spm-module", moduleName,
                                            "--file", inputFile,
                                            "--offset", offset])
     let result = keeper.syncRun()
-    print(String(data: result.1, encoding: .utf8)!)
+    let processer = SourceKittenProcesser()
+    let hints = processer.getCompletionHint(input: result.1)
+    for hint in hints {
+        print(hint)
+    }
 }
 
 main()
-
