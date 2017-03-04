@@ -1,4 +1,5 @@
 import Foundation
+import Yaml
 
 // MARK: - SwiftFileManager
 
@@ -11,6 +12,8 @@ public struct SwiftFileManager {
     public let filePath: String
     
     private static let SPM_MANIFEST = "Package.swift"
+    
+    private static let BUILD_CONFIG = ".build/debug.yaml"
     
     private var fileManager: FileManager {
         return FileManager.default
@@ -88,6 +91,35 @@ public struct SwiftFileManager {
         }
         
         return (packageName, targetNames)
+    }
+    
+    public var args: [String] {
+        let curDir = fileManager.currentDirectoryPath
+        let configPath = curDir + "/" + SwiftFileManager.BUILD_CONFIG
+        guard let fileHandle = FileHandle(forReadingAtPath: configPath) else {
+            return []
+        }
+        let configData = fileHandle.readDataToEndOfFile()
+        guard let configStr = String(data: configData, encoding: .utf8) else {
+            return []
+        }
+        let yaml = try! Yaml.load(configStr)
+        guard let commands = yaml["commands"].dictionary else {
+            return []
+        }
+        guard let moduleCommands = commands[.string("<\(moduleName!).module>")]?.dictionary else {
+            return []
+        }
+        guard let compilerArgs = moduleCommands["other-args"]?.array! else {
+            return []
+        }
+        var result: [String] = []
+        for arg in compilerArgs {
+            if let argStr = arg.string {
+                result.append(argStr)
+            }
+        }
+        return result
     }
     
     // MARK: - Functions
