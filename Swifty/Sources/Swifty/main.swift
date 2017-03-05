@@ -35,20 +35,19 @@ func main() {
     /// Check for the Package.swift file and use that to decide
     /// the working directory and module info.
     let sfm = SwiftFileManager(inputFile: inputFile)
-    guard let moduleName = sfm.moduleName else {
+    guard let text = sfm.content else {
         return
     }
-    
+
     let args = ["complete",
-                "--file", inputFile,
+                "--text", "\"\(text.replacingOccurrences(of: "\"", with: "\\\""))\"",
                 "--offset", offset,
-                "--",
-                "-module-name", moduleName] + sfm.args
+                "--"] + sfm.args
     let keeper = ProcessKeeper(execPath: "/usr/local/bin/sourcekitten", arguments: args)
-    print((["/usr/local/bin/sourcekitten"] + args).joined(separator: " "))
+//    print((["/usr/local/bin/sourcekitten"] + args).joined(separator: " "))
     let result = keeper.syncRun()
     let processer = SourceKittenProcesser()
-    let hints = processer.getCompletionHint(input: result.
+    let hints = processer.getCompletionHint(input: result.1)
     for hint in hints {
         print(hint)
     }

@@ -42,8 +42,8 @@ public struct ProcessKeeper {
         var outData = Data()
         var errData = Data()
         while newTask.isRunning {
-            outData.append(outPipe.fileHandleForReading.availableData)
-            errData.append(outPipe.fileHandleForReading.availableData)
+            outData.append(outPipe.fileHandleForReading.readDataToEndOfFile())
+            errData.append(errPipe.fileHandleForReading.readDataToEndOfFile())
         }
         newTask.waitUntilExit()
         

@@ -6,7 +6,7 @@ let package = Package(
       Target(name: "SwiftyFramework"),
       Target(name: "Swifty", dependencies: ["SwiftyFramework"])
     ],
-    dependencies: [                                                                                                                  
-	.Package(url: "https://github.com/behrang/YamlSwift", Version(3, 3, 1))                                                      
-    ] 
+    dependencies: [
+	.Package(url: "https://github.com/behrang/YamlSwift", Version(3, 3, 1))
+    ]
 )
