@@ -23,7 +23,7 @@ import SwiftyFramework
 /// Program entry.
 func main() {
     let argc = CommandLine.arguments.count
-    if argc < 3 {
+    if argc != 3 {
         print("Usage: Swifty [input file] [char offset]")
         return
     }
@@ -45,8 +45,7 @@ func main() {
                 "--",
                 "-module-name", moduleName] + sfm.args
     let keeper = ProcessKeeper(execPath: "/usr/local/bin/sourcekitten", arguments: args)
-    let run = (["/usr/local/bin/sourcekitten"] + args).joined(separator: " ")
-    print(run)
+    print((["/usr/local/bin/sourcekitten"] + args).joined(separator: " "))
     let result = keeper.syncRun()
     let processer = SourceKittenProcesser()
     let hints = processer.getCompletionHint(input: result.1)

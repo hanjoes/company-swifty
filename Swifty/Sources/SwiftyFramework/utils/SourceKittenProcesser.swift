@@ -18,11 +18,12 @@ public struct SourceKittenProcesser {
         guard let completions = completionsObj as? Array<Any> else {
             return hints
         }
+        print("length: \(completions.count)")
         
-        for completionObj in completions {
-            if let completion = completionObj as? Dictionary<String, Any> {
-                let name = completion["name"] as? String
-                let typeName = completion["typeName"] as? String
+        for anyCompletion in completions {
+            if let completion = anyCompletion as? Dictionary<String, String> {
+                let name = completion["name"]
+                let typeName = completion["typeName"]
                 if name != nil && typeName != nil {
                     hints.append(CompletionHint(name: name!, typeName: typeName!))
                 }
