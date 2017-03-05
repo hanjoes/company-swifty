@@ -19,12 +19,17 @@
   (format " %s" (get-text-property 0 'type candidate)))
 
 (defun company-swifty-candidates (arg callback)
-  (let ((cmd (list "/tmp/Swifty"
-                  (buffer-file-name)
-                  (number-to-string (point)))))
-    (with-temp-buffer
-      (call-process-shell-command (mapconcat 'identity cmd " ") nil t)
-      (funcall callback (company-swifty-process-output (buffer-substring (point-min) (point-max)))))))
+  (let ((offset (if arg (- (- (point) (length arg)) 1) (point))))
+    (let ((cmd (list "/tmp/Swifty"
+                    (buffer-file-name)
+                    (number-to-string offset))))
+    (progn
+      (message (number-to-string offset))
+      (message (mapconcat 'identity cmd " "))
+      (with-temp-buffer
+        (call-process-shell-command (mapconcat 'identity cmd " ") nil t)
+        (funcall callback (company-swifty-process-output
+                           (buffer-substring-no-properties (point-min) (point-max)))))))))
 
 (defun company-swifty-process-output (candidates)
   (append (mapcar
