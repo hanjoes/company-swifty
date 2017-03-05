@@ -49,5 +49,21 @@ public struct ProcessKeeper {
         
         return (Int(newTask.terminationStatus), outData, errData)
     }
+    
+    /// Launch in the specified working directory.
+    /// And reset to the previous working directory after execution.
+    ///
+    /// - Parameter cwd: current working directory
+    /// - Returns: the result of running process
+    public func syncRun(withCWD cwd: String) -> ProcessLaunchResult {
+        let fm = FileManager.default
+        let prev = fm.currentDirectoryPath
+        
+        fm.changeCurrentDirectoryPath(cwd)
+        let result = syncRun()
+        fm.changeCurrentDirectoryPath(prev)
+        
+        return result
+    }
 }
 

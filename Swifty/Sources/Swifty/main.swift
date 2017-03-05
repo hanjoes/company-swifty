@@ -40,7 +40,7 @@ func main() {
     }
 
     let args = ["complete",
-                "--text", "\"\(text.replacingOccurrences(of: "\"", with: "\\\""))\"",
+                "--text", text,
                 "--offset", offset,
                 "--"] + sfm.args
     let keeper = ProcessKeeper(execPath: "/usr/local/bin/sourcekitten", arguments: args)

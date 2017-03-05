@@ -5,6 +5,8 @@ import Yaml
 
 /// File related functionalities.
 public struct SwiftFileManager {
+    
+    public typealias DirectoryInfo = (packageDir: String, sourceDir: String)
 
     // MARK: - Properties
 
@@ -19,18 +21,27 @@ public struct SwiftFileManager {
         return FileManager.default
     }
 
-    public var moduleName: String? {
+    public var directoryInfo: DirectoryInfo? {
         let absPath = Pathy(filePath).absPath
 
-        guard let (packageDirectory, sourcesDirectory) = getDirectories(from: absPath) else {
+        // TODO: - What if the file is the Package.swift?
+
+        // for swift project, there must be a "Sources" folder
+        // and Package.swift must be at one level higher.
+        guard let sourcesRange = absPath.range(of: "Sources") else {
             return nil
         }
 
-        // change working directory to the one contains manifest
-        fileManager.changeCurrentDirectoryPath(packageDirectory)
+        // get working directory
+        let packageDirectory = absPath.substring(to: sourcesRange.lowerBound)
+        let sourcesDirectory = absPath.substring(to: sourcesRange.upperBound)
+        return (packageDirectory, sourcesDirectory)
+    }
 
-        // get manifest file path
-        guard fileManager.fileExists(atPath: SwiftFileManager.SPM_MANIFEST) else {
+    public var moduleName: String? {
+        let absPath = Pathy(filePath).absPath
+
+        guard let dirInfo = directoryInfo else {
             return nil
         }
 
@@ -48,7 +59,7 @@ public struct SwiftFileManager {
             // a targetName can be used to represent a module only
             // if ../Sources/<targetName> is a directory
             for targetName in targetNames {
-                let modulePath = Pathy(sourcesDirectory)/Pathy(targetName)
+                let modulePath = Pathy(dirInfo.sourceDir)/Pathy(targetName)
                 if modulePath.isDirectory && absPath.hasPrefix(modulePath.path) {
                     return targetName
                 }
@@ -58,9 +69,18 @@ public struct SwiftFileManager {
     }
 
     var packageInfo: (String, [String])? {
+        guard let dirInfo = directoryInfo else {
+            return nil
+        }
+
+        // get manifest file path
+        guard fileManager.fileExists(atPath: dirInfo.packageDir + SwiftFileManager.SPM_MANIFEST) else {
+            return nil
+        }
+        
         // dump package info
         let keeper = ProcessKeeper(execPath: "/usr/bin/swift", arguments: ["package", "dump-package"])
-        let keeperResult = keeper.syncRun()
+        let keeperResult = keeper.syncRun(withCWD: dirInfo.packageDir)
 
         guard keeperResult.0 == 0 else {
             return nil
@@ -102,8 +122,10 @@ public struct SwiftFileManager {
     }
 
     public var args: [String] {
-        let curDir = fileManager.currentDirectoryPath
-        let configPath = curDir + "/" + SwiftFileManager.BUILD_CONFIG
+        guard let dirInfo = directoryInfo else {
+            return []
+        }
+        let configPath = dirInfo.packageDir + SwiftFileManager.BUILD_CONFIG
         guard let fileHandle = FileHandle(forReadingAtPath: configPath) else {
             return []
         }
@@ -145,22 +167,6 @@ public struct SwiftFileManager {
 
     public init(inputFile: String) {
         filePath = inputFile
-    }
-
-    private func getDirectories(from absPath: String) -> (String, String)? {
-
-        // TODO: - What if the file is the Package.swift?
-
-        // for swift project, there must be a "Sources" folder
-        // and Package.swift must be at one level higher.
-        guard let sourcesRange = absPath.range(of: "Sources") else {
-            return nil
-        }
-
-        // get working directory
-        let packageDirectory = absPath.substring(to: sourcesRange.lowerBound)
-        let sourcesDirectory = absPath.substring(to: sourcesRange.upperBound)
-        return (packageDirectory, sourcesDirectory)
     }
 
 }
