@@ -1,2 +1,3 @@
 # company-swifty
-Company backend for Swift.
+
+This project doesn't seem worth the effort anymore.
