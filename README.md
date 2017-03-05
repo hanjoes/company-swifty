@@ -6,7 +6,7 @@ By merely invoking sourcekitten from commandline is too slow for multi-module pr
 
 There are still a lot of issues with the completion, but the below screenshot gives some tastes.
 
-[Screenshot](companyswiftscreen.gif)
+![Screenshot](companyswiftscreen.gif)
 
 I'm not motivated to update this project anymore.
 
